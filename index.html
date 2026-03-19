@@ -26,7 +26,7 @@
         .btn-restore { background-color: #d35400; }
         .btn-restore:hover { background-color: #e67e22; }
         
-        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; scroll-behavior: smooth; }
         .wiki-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; }
         
         /* 갤러리 뷰 스타일 */
@@ -47,13 +47,23 @@
         .read-name { font-size: 32px; font-weight: bold; margin: 0 0 10px 0; color: #2c3e50; }
         .read-role { font-size: 18px; color: #7f8c8d; margin: 0; }
         
-        /* 정보 테이블 (위키 인포박스 느낌) */
+        /* 정보 테이블 */
         .info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; background-color: #f8f9fa; border-radius: 8px; overflow: hidden; border: 1px solid #e9ecef;}
         .info-table th, .info-table td { padding: 12px 15px; border-bottom: 1px solid #e9ecef; }
         .info-table th { width: 30%; text-align: left; background-color: #e9ecef; color: #495057; }
         .info-table tr:last-child th, .info-table tr:last-child td { border-bottom: none; }
         
-        .read-story { line-height: 1.6; font-size: 16px; color: #34495e; white-space: pre-wrap; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee;}
+        /* 자동 생성 목차 (TOC) 스타일 */
+        .toc-container { border: 1px solid #a2a9b1; background-color: #f8f9fa; padding: 15px 20px; border-radius: 5px; margin-bottom: 30px; display: inline-block; min-width: 250px;}
+        .toc-title { font-weight: bold; font-size: 18px; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;}
+        .toc-list { list-style: none; padding-left: 0; margin: 0; line-height: 1.8;}
+        .toc-list li a { text-decoration: none; color: #0645ad; font-size: 15px;}
+        .toc-list li a:hover { text-decoration: underline; }
+
+        /* 문단 렌더링 스타일 */
+        .wiki-section { margin-bottom: 30px; }
+        .wiki-section-title { font-size: 24px; color: #2c3e50; border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 15px; margin-top: 0;}
+        .wiki-section-content { line-height: 1.6; font-size: 16px; color: #34495e; white-space: pre-wrap; word-break: keep-all;}
 
         /* --- 편집 모드 (Edit View) 스타일 --- */
         .profile-header { display: flex; align-items: center; margin-bottom: 20px; }
@@ -62,16 +72,21 @@
         .image-uploader .placeholder { color: #888; text-align: center; font-size: 14px;}
         
         input[type="text"], textarea { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: inherit; }
-        textarea { resize: vertical; min-height: 150px; }
         
-        /* 자유 항목 스타일 */
         .custom-field-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
         .custom-field-row input { margin-bottom: 0; }
         .custom-field-row .label-input { width: 30%; font-weight: bold; background-color: #f8f9fa; border-color: #bbb;}
         .custom-field-row .value-input { width: 70%; }
         .btn-remove-field { background-color: #e74c3c; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: 0.2s;}
-        .btn-add-field { background-color: #ecf0f1; color: #2c3e50; border: 2px dashed #bdc3c7; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 20px; transition: 0.2s;}
-        .btn-add-field:hover { background-color: #e2e6e8; border-color: #95a5a6; }
+        
+        /* 문단 편집 블록 스타일 */
+        .section-edit-block { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative;}
+        .section-edit-block textarea { min-height: 120px; resize: vertical; margin-bottom: 0;}
+        .section-edit-block input { font-weight: bold; font-size: 16px; margin-bottom: 10px;}
+        .btn-remove-section { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 5px 10px; cursor: pointer; font-size: 12px;}
+        
+        .btn-add-dashed { background-color: #ecf0f1; color: #2c3e50; border: 2px dashed #bdc3c7; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 20px; transition: 0.2s;}
+        .btn-add-dashed:hover { background-color: #e2e6e8; border-color: #95a5a6; }
 
         .button-group { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee;}
         .btn { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.2s; font-weight: bold;}
@@ -87,7 +102,7 @@
     <div class="sidebar">
         <h2>📚 위키 메뉴</h2>
         <button class="btn-menu btn-gallery" onclick="showGallery()">🗂️ 전체 갤러리 보기</button>
-        <button class="btn-menu btn-add" onclick="createNew()">+ 새 캐릭터 추가</button>
+        <button class="btn-menu btn-add" onclick="createNew()">+ 새 문서 작성</button>
         
         <h3 style="font-size: 15px; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #34495e; padding-bottom: 5px;">목록</h3>
         <ul class="char-list" id="charList"></ul>
@@ -114,12 +129,14 @@
                 </div>
             </div>
 
-            <h3 style="margin-top:0; color: #2c3e50;">상세 정보</h3>
-            <table class="info-table" id="readCustomFieldsTable">
-                </table>
+            <table class="info-table" id="readCustomFieldsTable"></table>
 
-            <h3 style="color: #2c3e50;">배경 스토리 및 메모</h3>
-            <div class="read-story" id="readStory"></div>
+            <div id="readTocContainer" class="toc-container" style="display: none;">
+                <div class="toc-title">목차</div>
+                <ul class="toc-list" id="readTocList"></ul>
+            </div>
+
+            <div id="readSectionsContainer"></div>
 
             <div class="button-group">
                 <button class="btn" onclick="editCurrentCharacter()">✏️ 문서 편집하기</button>
@@ -127,7 +144,7 @@
         </div>
 
         <div class="wiki-card" id="editView" style="display: none;">
-            <h1 id="formTitle" style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;">캐릭터 정보 편집</h1>
+            <h1 id="formTitle" style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;">문서 편집</h1>
             
             <div class="profile-header">
                 <div class="image-uploader" id="imageUploader" onclick="document.getElementById('charImageInput').click()">
@@ -137,20 +154,21 @@
                 <input type="file" id="charImageInput" accept="image/*" style="display: none;" onchange="previewImage()">
                 
                 <div style="flex-grow: 1;">
-                    <label for="charName"><strong>이름</strong></label>
+                    <label><strong>문서 제목 (이름)</strong></label>
                     <input type="text" id="charName" placeholder="캐릭터 이름">
                     
-                    <label for="charRole"><strong>핵심 요약 (직업/역할)</strong></label>
+                    <label><strong>핵심 요약 (직업/역할)</strong></label>
                     <input type="text" id="charRole" placeholder="예: 창조신, 프로그래머, 작곡가 등">
                 </div>
             </div>
 
-            <label><strong>상세 정보 (자유 항목)</strong></label>
+            <label><strong>정보 박스 (자유 항목)</strong></label>
             <div id="customFieldsContainer"></div>
-            <button class="btn-add-field" onclick="addCustomField()">+ 새로운 항목 추가 (예: 나이, 소속, 무기 등)</button>
+            <button class="btn-add-dashed" onclick="addCustomField()">+ 정보 박스 항목 추가 (예: 나이, 소속 등)</button>
 
-            <label for="charStory"><strong>배경 스토리 및 기타 메모</strong></label>
-            <textarea id="charStory" placeholder="캐릭터의 과거나 성격, 특징을 자유롭게 적어주세요."></textarea>
+            <label><strong>본문 문단 작성</strong></label>
+            <div id="sectionsEditContainer"></div>
+            <button class="btn-add-dashed" onclick="addSectionEditBlock()">+ 새 문단 추가 (예: 개요, 작중 행적, 능력 등)</button>
 
             <div class="button-group">
                 <button class="btn" onclick="saveCharacter()">💾 문서 저장</button>
@@ -161,40 +179,67 @@
     </div>
 
     <script>
+        // 초기 데이터를 문단(sections) 구조로 변경했습니다.
         const initialData = [
             { 
-                id: 1, name: "모나드", role: "세계를 창조하는 신", story: "프로그래밍을 통해 세계를 창조하는 신. 4차원적인 성격을 지녔다.", image: null,
-                customFields: [ { label: "성별", value: "불명" }, { label: "창조 방식", value: "프로그래밍" } ]
+                id: 1, name: "모나드", role: "세계를 창조하는 신", image: null,
+                customFields: [ { label: "성별", value: "불명" }, { label: "창조 방식", value: "프로그래밍" } ],
+                sections: [
+                    { title: "개요", content: "프로그래밍을 통해 세계를 창조하는 신이다." },
+                    { title: "성격 및 특징", content: "일반적인 상식으로는 이해하기 힘든 4차원적인 성격을 지니고 있다." }
+                ]
             },
             { 
-                id: 2, name: "우에하라 츠바사", role: "학생", story: "메이드복을 즐겨 입는 귀여운 남자아이.", image: null,
-                customFields: [ { label: "성별", value: "남자아이" }, { label: "선호 복장", value: "메이드복" } ]
+                id: 2, name: "우에하라 츠바사", role: "학생", image: null,
+                customFields: [ { label: "성별", value: "남자아이" }, { label: "선호 복장", value: "메이드복" } ],
+                sections: [
+                    { title: "개요", content: "학교에 다니는 귀여운 소년." },
+                    { title: "특징", content: "평소 메이드복을 즐겨 입는 독특한 취향을 가지고 있다." }
+                ]
             },
             { 
-                id: 3, name: "라니야 샤힌", role: "파이썬/IoT 프로그래머", story: "집중력이 뛰어난 프로그래머이자 AI 비서 RAZIEL의 개발자.\n\n\"에헤헤... 나 지금 파이썬 코딩 집중하는 중이니까... 쪼오끔만 조용히 해줄래...? 힝... 부탁할게에~\"", image: null,
-                customFields: [ { label: "성격", value: "내향적" }, { label: "주력 언어", value: "Python" }, { label: "개발한 AI", value: "RAZIEL" } ]
+                id: 3, name: "라니야 샤힌", role: "파이썬/IoT 프로그래머", image: null,
+                customFields: [ { label: "성격", value: "내향적" }, { label: "주력 언어", value: "Python" }, { label: "개발한 AI", value: "RAZIEL" } ],
+                sections: [
+                    { title: "개요", content: "고도의 집중력을 지닌 천재적인 파이썬 및 IoT 시스템 프로그래머." },
+                    { title: "작중 행적 및 AI 개발", content: "자신을 돕는 인공지능 비서 'RAZIEL'을 직접 개발하였다.\n\n평소에는 내향적이고 수줍음이 많지만 코딩을 할 때만큼은 무서운 집중력을 보여준다.\n\n\"에헤헤... 나 지금 파이썬 코딩 집중하는 중이니까... 쪼오끔만 조용히 해줄래...? 힝... 부탁할게에~\"" }
+                ]
             },
             { 
-                id: 4, name: "인티사르 이사", role: "사후세계의 작곡가", story: "한국에서 살았던 경험이 있으며, 사후세계에서 카페를 배경으로 활동하는 작곡가.", image: null,
-                customFields: [ { label: "나이", value: "18세" }, { label: "국적", value: "팔레스타인" } ]
+                id: 4, name: "인티사르 에이사", role: "사후세계의 작곡가", image: null,
+                customFields: [ { label: "나이", value: "18세" }, { label: "국적", value: "팔레스타인" } ],
+                sections: [
+                    { title: "개요", content: "사후세계에서 활동하고 있는 천재적인 18세 작곡가 소녀." },
+                    { title: "생애 및 활동", content: "생전에는 대한민국에서 살았던 경험이 있다. 현재는 사후세계의 한 아늑한 카페를 무대로 삼아 아름다운 음악을 작곡하며 사람들을 위로하고 있다." }
+                ]
             }
         ];
 
         let characters = [];
         let currentImageBase64 = null;
-        let viewingCharId = null; // 현재 열람/편집 중인 캐릭터의 ID 기록
+        let viewingCharId = null; 
 
         function loadData() {
             const saved = localStorage.getItem('myCharacters');
-            if (saved) { characters = JSON.parse(saved); } 
-            else { characters = initialData; saveToLocalStorage(); }
+            if (saved) { 
+                characters = JSON.parse(saved); 
+                // 이전 버전(단일 story) 데이터가 있다면 sections 배열로 마이그레이션
+                characters.forEach(char => {
+                    if (char.story && (!char.sections || char.sections.length === 0)) {
+                        char.sections = [{ title: "개요", content: char.story }];
+                        delete char.story;
+                    }
+                });
+            } else { 
+                characters = initialData; 
+                saveToLocalStorage(); 
+            }
             renderList();
             showGallery(); 
         }
 
         function saveToLocalStorage() { localStorage.setItem('myCharacters', JSON.stringify(characters)); }
 
-        // --- 화면 전환 함수들 ---
         function hideAllViews() {
             document.getElementById('galleryView').style.display = 'none';
             document.getElementById('readView').style.display = 'none';
@@ -208,14 +253,13 @@
             renderGallery();
         }
 
-        // --- 1. 갤러리 로직 ---
         function renderGallery() {
             const grid = document.getElementById('galleryGrid');
             grid.innerHTML = '';
             characters.forEach(char => {
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
-                item.onclick = () => loadCharacter(char.id); // 클릭 시 열람 모드로
+                item.onclick = () => loadCharacter(char.id); 
                 const imgHtml = char.image ? `<img src="${char.image}" alt="${char.name}">` : `<span style="color: #ccc; font-size: 40px;">👤</span>`;
                 item.innerHTML = `
                     <div class="gallery-img-wrapper">${imgHtml}</div>
@@ -230,7 +274,7 @@
 
         function renderList() {
             const listEl = document.getElementById('charList');
-            listEl.innerHTML = '';
+            listEl.innerHTML = ''; 
             characters.forEach(char => {
                 const li = document.createElement('li');
                 const img = document.createElement('img');
@@ -243,16 +287,14 @@
             });
         }
 
-        // --- 2. 열람 모드 (Read View) 로직 ---
+        // --- 열람 모드 (Read View) 로직 ---
         function loadCharacter(id) {
             const char = characters.find(c => c.id === id);
             if (!char) return;
             viewingCharId = char.id;
 
-            // 열람 화면에 데이터 채우기
             document.getElementById('readName').textContent = char.name || '이름 없음';
             document.getElementById('readRole').textContent = char.role || '역할 미상';
-            document.getElementById('readStory').textContent = char.story || '기록된 스토리가 없습니다.';
 
             if (char.image) {
                 document.getElementById('readImage').src = char.image;
@@ -261,7 +303,7 @@
                 document.getElementById('readImage').style.display = 'none';
             }
 
-            // 정보 테이블 (자유 항목) 채우기
+            // 정보 테이블 렌더링
             const table = document.getElementById('readCustomFieldsTable');
             table.innerHTML = '';
             if (char.customFields && char.customFields.length > 0) {
@@ -272,27 +314,67 @@
                 });
                 table.style.display = 'table';
             } else {
-                table.style.display = 'none'; // 항목이 없으면 테이블 숨김
+                table.style.display = 'none'; 
+            }
+
+            // 목차(TOC) 및 본문(Sections) 렌더링
+            const tocContainer = document.getElementById('readTocContainer');
+            const tocList = document.getElementById('readTocList');
+            const sectionsContainer = document.getElementById('readSectionsContainer');
+            
+            tocList.innerHTML = '';
+            sectionsContainer.innerHTML = '';
+
+            if (char.sections && char.sections.length > 0) {
+                tocContainer.style.display = 'inline-block';
+                
+                char.sections.forEach((sec, index) => {
+                    const secId = `section-${index}`;
+                    
+                    // 목차 항목 생성
+                    const tocLi = document.createElement('li');
+                    tocLi.innerHTML = `<a href="javascript:void(0)" onclick="document.getElementById('${secId}').scrollIntoView({behavior: 'smooth'})">${index + 1}. ${sec.title}</a>`;
+                    tocList.appendChild(tocLi);
+
+                    // 본문 문단 생성
+                    const secDiv = document.createElement('div');
+                    secDiv.className = 'wiki-section';
+                    secDiv.id = secId;
+                    secDiv.innerHTML = `
+                        <h2 class="wiki-section-title">${index + 1}. ${sec.title}</h2>
+                        <div class="wiki-section-content">${sec.content}</div>
+                    `;
+                    sectionsContainer.appendChild(secDiv);
+                });
+            } else {
+                tocContainer.style.display = 'none';
             }
 
             hideAllViews();
             document.getElementById('readView').style.display = 'block';
+            // 페이지 상단으로 스크롤 이동
+            document.querySelector('.main-content').scrollTop = 0; 
         }
 
-        // --- 3. 편집 모드 (Edit View) 로직 ---
+        // --- 편집 모드 (Edit View) 로직 ---
         function editCurrentCharacter() {
             if (!viewingCharId) return;
             const char = characters.find(c => c.id === viewingCharId);
             if (!char) return;
 
-            // 편집 폼에 기존 데이터 채우기
             document.getElementById('charName').value = char.name;
             document.getElementById('charRole').value = char.role;
-            document.getElementById('charStory').value = char.story;
 
+            // 정보 박스 항목 채우기
             document.getElementById('customFieldsContainer').innerHTML = '';
             if (char.customFields) {
                 char.customFields.forEach(field => addCustomField(field.label, field.value));
+            }
+
+            // 본문 문단 항목 채우기
+            document.getElementById('sectionsEditContainer').innerHTML = '';
+            if (char.sections) {
+                char.sections.forEach(sec => addSectionEditBlock(sec.title, sec.content));
             }
 
             if (char.image) {
@@ -304,7 +386,7 @@
                 resetImagePreview();
             }
 
-            document.getElementById('formTitle').innerText = '📝 캐릭터 정보 편집';
+            document.getElementById('formTitle').innerText = '📝 문서 편집';
             document.getElementById('deleteBtn').style.display = 'inline-block';
             
             hideAllViews();
@@ -312,16 +394,19 @@
         }
 
         function createNew() {
-            viewingCharId = null; // 새 캐릭터 작성이므로 현재 ID 초기화
+            viewingCharId = null; 
             
             document.getElementById('charName').value = '';
             document.getElementById('charRole').value = '';
-            document.getElementById('charStory').value = '';
             document.getElementById('customFieldsContainer').innerHTML = '';
+            document.getElementById('sectionsEditContainer').innerHTML = '';
+            
+            // 새 문서 작성 시 기본 문단 1개 추가
+            addSectionEditBlock('개요', ''); 
             
             resetImagePreview();
             
-            document.getElementById('formTitle').innerText = '✨ 새 캐릭터 작성';
+            document.getElementById('formTitle').innerText = '✨ 새 문서 작성';
             document.getElementById('deleteBtn').style.display = 'none';
 
             hideAllViews();
@@ -340,51 +425,68 @@
             container.appendChild(row);
         }
 
+        // 새로운 문단 편집 블록을 추가하는 함수
+        function addSectionEditBlock(title = '', content = '') {
+            const container = document.getElementById('sectionsEditContainer');
+            const block = document.createElement('div');
+            block.className = 'section-edit-block';
+            block.innerHTML = `
+                <button class="btn-remove-section" onclick="this.parentElement.remove()">삭제</button>
+                <input type="text" class="section-title" placeholder="문단 제목 (예: 작중 행적, 능력, 성격)" value="${title}">
+                <textarea class="section-content" placeholder="이 문단에 들어갈 내용을 적어주세요...">${content}</textarea>
+            `;
+            container.appendChild(block);
+        }
+
         function saveCharacter() {
+            // 정보 박스 데이터 수집
             const customFieldsArray = [];
-            const rows = document.querySelectorAll('.custom-field-row');
-            rows.forEach(row => {
+            const cfRows = document.querySelectorAll('.custom-field-row');
+            cfRows.forEach(row => {
                 const label = row.querySelector('.label-input').value.trim();
                 const value = row.querySelector('.value-input').value.trim();
                 if (label !== '' || value !== '') { customFieldsArray.push({ label, value }); }
             });
 
+            // 문단 데이터 수집
+            const sectionsArray = [];
+            const secBlocks = document.querySelectorAll('.section-edit-block');
+            secBlocks.forEach(block => {
+                const title = block.querySelector('.section-title').value.trim();
+                const content = block.querySelector('.section-content').value.trim();
+                if (title !== '' || content !== '') {
+                    // 제목을 적지 않았으면 임시 제목 부여
+                    sectionsArray.push({ title: title || '제목 없음', content: content });
+                }
+            });
+
             const newChar = {
                 name: document.getElementById('charName').value,
                 role: document.getElementById('charRole').value,
-                story: document.getElementById('charStory').value,
                 image: currentImageBase64,
-                customFields: customFieldsArray
+                customFields: customFieldsArray,
+                sections: sectionsArray // 배열로 저장
             };
 
             if (viewingCharId) {
-                // 기존 캐릭터 업데이트
                 const index = characters.findIndex(c => c.id === viewingCharId);
                 if (index !== -1) {
                     characters[index] = { ...characters[index], ...newChar };
                 }
             } else {
-                // 새 캐릭터 추가
                 newChar.id = Date.now();
                 characters.push(newChar);
-                viewingCharId = newChar.id; // 저장 후 열람 모드로 가기 위해 ID 기록
+                viewingCharId = newChar.id; 
             }
 
             saveToLocalStorage();
             renderList();
-            
-            // 저장 완료 후 다시 열람 모드(Read View)로 이동
             loadCharacter(viewingCharId); 
         }
 
         function cancelEdit() {
-            if (viewingCharId) {
-                // 기존 캐릭터 편집 중 취소 -> 열람 모드로 복귀
-                loadCharacter(viewingCharId);
-            } else {
-                // 새 캐릭터 작성 중 취소 -> 갤러리로 복귀
-                showGallery();
-            }
+            if (viewingCharId) { loadCharacter(viewingCharId); } 
+            else { showGallery(); }
         }
 
         function deleteCharacter() {
@@ -397,7 +499,7 @@
             }
         }
 
-        // --- 이미지 업로드 로직 ---
+        // --- 이미지/백업 관련 (이전과 동일) ---
         function previewImage() {
             const fileInput = document.getElementById('charImageInput');
             const previewImg = document.getElementById('charImagePreview');
@@ -421,7 +523,6 @@
             currentImageBase64 = null;
         }
 
-        // --- 백업/복구 로직 ---
         function exportData() {
             if (characters.length === 0) { alert("백업할 데이터가 없습니다."); return; }
             const dataStr = JSON.stringify(characters, null, 2);
