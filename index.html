@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나만의 캐릭터 위키</title>
+    <title>아리하위키</title>
     <style>
         body { font-family: 'Pretendard', sans-serif; display: flex; margin: 0; height: 100vh; background-color: #f4f4f9; color: #333; }
         
         /* 사이드바 스타일 */
         .sidebar { width: 250px; background-color: #2c3e50; color: white; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; flex-shrink: 0;}
         .sidebar h2 { margin-top: 0; border-bottom: 2px solid #34495e; padding-bottom: 10px; font-size: 20px;}
+        
+        /* 🆕 검색창 스타일 */
+        .search-box { width: 100%; padding: 10px 12px; margin-bottom: 15px; border: none; border-radius: 5px; box-sizing: border-box; background-color: #1a252f; color: white; font-family: inherit; font-size: 14px; transition: 0.2s;}
+        .search-box::placeholder { color: #7f8c8d; }
+        .search-box:focus { outline: 2px solid #3498db; background-color: #0f161c;}
+
         .char-list { list-style: none; padding: 0; flex-grow: 1; overflow-y: auto; margin-bottom: 10px;}
         .char-list li { padding: 10px; margin-bottom: 5px; background-color: #34495e; cursor: pointer; border-radius: 5px; transition: 0.2s; display: flex; align-items: center; }
         .char-list li:hover { background-color: #415b76; }
@@ -32,19 +38,31 @@
         /* 갤러리 뷰 스타일 */
         .gallery-header { margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;}
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        .gallery-item { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-        .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
+        .gallery-item { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #eee;}
+        .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); border-color: #ccc;}
         .gallery-img-wrapper { width: 100%; height: 200px; background-color: #eee; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .gallery-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
         .gallery-info { padding: 15px; text-align: center; }
         .gallery-name { font-weight: bold; font-size: 18px; margin-bottom: 5px; color: #2c3e50;}
         .gallery-role { font-size: 13px; color: #7f8c8d; }
 
+        /* 필터 배너 */
+        .filter-banner { background-color: #e8f4f8; border: 1px solid #bce8f1; color: #31708f; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold;}
+        .btn-clear-filter { background-color: #31708f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 13px;}
+        .btn-clear-filter:hover { background-color: #245269; }
+
         /* --- 열람 모드 (Read View) 레이아웃 --- */
         .read-title-group { margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
         .read-name { font-size: 36px; font-weight: bold; margin: 0 0 5px 0; color: #2c3e50; }
-        .read-role { font-size: 18px; color: #7f8c8d; margin: 0; }
+        .read-role { font-size: 18px; color: #7f8c8d; margin: 0 0 15px 0; }
         
+        /* 분류 박스 */
+        .category-box { border: 1px solid #ccc; padding: 10px 15px; border-radius: 4px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 14px; background-color: #fdfdfd;}
+        .category-label { font-weight: bold; color: #2c3e50; }
+        .category-tag { color: #0645ad; cursor: pointer; text-decoration: none; display: flex; align-items: center;}
+        .category-tag:hover { text-decoration: underline; color: #0b0080;}
+        .category-separator { color: #ccc; margin: 0 2px; }
+
         .top-layout-group { display: flex; gap: 30px; margin-bottom: 40px; align-items: flex-start; }
         .left-content-group { flex: 1; display: flex; flex-direction: column; gap: 20px;}
         
@@ -104,15 +122,18 @@
 <body>
 
     <div class="sidebar">
-        <h2>📚 위키 메뉴</h2>
-        <button class="btn-menu btn-gallery" onclick="showGallery()">🗂️ 전체 갤러리 보기</button>
+        <h2>메뉴</h2>
+        
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 이름 또는 역할 검색..." oninput="performSearch()">
+
+        <button class="btn-menu btn-gallery" onclick="clearFilterAndShowGallery()">🗂️ 전체 갤러리 보기</button>
         <button class="btn-menu btn-add" onclick="createNew()">+ 새 문서 작성</button>
         
         <h3 style="font-size: 15px; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #34495e; padding-bottom: 5px;">목록</h3>
         <ul class="char-list" id="charList"></ul>
 
         <h3 style="font-size: 15px; margin-top: auto; margin-bottom: 10px; border-bottom: 1px solid #34495e; padding-bottom: 5px;">데이터 관리</h3>
-        <button class="btn-menu btn-backup" onclick="exportData()">💾 백업하기 (.json)</button>
+        <button class="btn-menu btn-backup" onclick="exportData()">💾 백업하기</button>
         <button class="btn-menu btn-restore" onclick="document.getElementById('importInput').click()">📂 불러오기</button>
         <input type="file" id="importInput" accept=".json" style="display: none;" onchange="importData(event)">
     </div>
@@ -120,7 +141,13 @@
     <div class="main-content">
         
         <div id="galleryView">
-            <h1 class="gallery-header">🗂️ 전체 캐릭터 갤러리</h1>
+            <h1 class="gallery-header">캐릭터 갤러리</h1>
+            
+            <div id="filterBanner" class="filter-banner" style="display: none;">
+                <span>현재 <strong>[<span id="currentFilterText"></span>]</strong> 분류의 문서만 보고 있습니다.</span>
+                <button class="btn-clear-filter" onclick="clearFilterAndShowGallery()">전체 보기 (필터 해제)</button>
+            </div>
+
             <div class="gallery-grid" id="galleryGrid"></div>
         </div>
 
@@ -128,6 +155,7 @@
             <div class="read-title-group">
                 <h1 class="read-name" id="readName">이름</h1>
                 <p class="read-role" id="readRole">역할</p>
+                <div id="readCategoriesBox" class="category-box" style="display: none;"></div>
             </div>
 
             <div class="top-layout-group">
@@ -170,6 +198,9 @@
                 </div>
             </div>
 
+            <label><strong>분류 (태그)</strong></label>
+            <input type="text" id="charCategories" placeholder="쉼표(,)로 구분해서 입력해주세요. (예: 인간, 프로그래머, 주인공)">
+
             <label><strong>정보 박스 (자유 항목)</strong></label>
             <div id="customFieldsContainer"></div>
             <button class="btn-add-dashed" onclick="addCustomField()">+ 정보 박스 항목 추가 (예: 나이, 소속 등)</button>
@@ -188,15 +219,17 @@
 
     <script>
         const initialData = [
-            { id: 1, name: "모나드", role: "세계를 창조하는 신", image: null, customFields: [ { label: "성별", value: "불명" }, { label: "창조 방식", value: "프로그래밍" } ], sections: [ { title: "개요", content: "프로그래밍을 통해 세계를 창조하는 신이다." }, { title: "성격 및 특징", content: "일반적인 상식으로는 이해하기 힘든 4차원적인 성격을 지니고 있다." } ] },
-            { id: 2, name: "우에하라 츠바사", role: "학생", image: null, customFields: [ { label: "성별", value: "남자아이" }, { label: "선호 복장", value: "메이드복" } ], sections: [ { title: "개요", content: "학교에 다니는 귀여운 소년." }, { title: "특징", content: "평소 메이드복을 즐겨 입는 독특한 취향을 가지고 있다." } ] },
-            { id: 3, name: "라니야 샤힌", role: "파이썬/IoT 프로그래머", image: null, customFields: [ { label: "성격", value: "내향적" }, { label: "주력 언어", value: "Python" }, { label: "개발한 AI", value: "RAZIEL" } ], sections: [ { title: "개요", content: "고도의 집중력을 지닌 천재적인 파이썬 및 IoT 시스템 프로그래머." }, { title: "작중 행적 및 AI 개발", content: "자신을 돕는 인공지능 비서 'RAZIEL'을 직접 개발하였다.\n\n평소에는 내향적이고 수줍음이 많지만 코딩을 할 때만큼은 무서운 집중력을 보여준다.\n\n\"에헤헤... 나 지금 파이썬 코딩 집중하는 중이니까... 쪼오끔만 조용히 해줄래...? 힝... 부탁할게에~\"" } ] },
-            { id: 4, name: "인티사르 이사", role: "사후세계의 작곡가", image: null, customFields: [ { label: "나이", value: "18세" }, { label: "국적", value: "팔레스타인" } ], sections: [ { title: "개요", content: "사후세계에서 활동하고 있는 천재적인 18세 작곡가 소녀." }, { title: "생애 및 활동", content: "생전에는 대한민국에서 살았던 경험이 있다. 현재는 사후세계의 한 아늑한 카페를 무대로 삼아 아름다운 음악을 작곡하며 사람들을 위로하고 있다." } ] }
+            { id: 1, name: "모나드", role: "세계를 창조하는 신", image: null, categories: ["신", "창조자"], customFields: [ { label: "성별", value: "불명" }, { label: "창조 방식", value: "프로그래밍" } ], sections: [ { title: "개요", content: "프로그래밍을 통해 세계를 창조하는 신이다." }, { title: "성격 및 특징", content: "일반적인 상식으로는 이해하기 힘든 4차원적인 성격을 지니고 있다." } ] },
+            { id: 2, name: "우에하라 츠바사", role: "학생", image: null, categories: ["인간", "학생"], customFields: [ { label: "성별", value: "남자아이" }, { label: "선호 복장", value: "메이드복" } ], sections: [ { title: "개요", content: "학교에 다니는 귀여운 소년." }, { title: "특징", content: "평소 메이드복을 즐겨 입는 독특한 취향을 가지고 있다." } ] },
+            { id: 3, name: "라니야 샤힌", role: "파이썬/IoT 프로그래머", image: null, categories: ["인간", "프로그래머", "개발자"], customFields: [ { label: "성격", value: "내향적" }, { label: "주력 언어", value: "Python" }, { label: "개발한 AI", value: "RAZIEL" } ], sections: [ { title: "개요", content: "고도의 집중력을 지닌 천재적인 파이썬 및 IoT 시스템 프로그래머." }, { title: "작중 행적 및 AI 개발", content: "자신을 돕는 인공지능 비서 'RAZIEL'을 직접 개발하였다.\n\n평소에는 내향적이고 수줍음이 많지만 코딩을 할 때만큼은 무서운 집중력을 보여준다.\n\n\"에헤헤... 나 지금 파이썬 코딩 집중하는 중이니까... 쪼오끔만 조용히 해줄래...? 힝... 부탁할게에~\"" } ] },
+            { id: 4, name: "인티사르 이사", role: "사후세계의 작곡가", image: null, categories: ["사후세계", "작곡가", "여성"], customFields: [ { label: "나이", value: "18세" }, { label: "국적", value: "팔레스타인" } ], sections: [ { title: "개요", content: "사후세계에서 활동하고 있는 천재적인 18세 작곡가 소녀." }, { title: "생애 및 활동", content: "생전에는 대한민국에서 살았던 경험이 있다. 현재는 사후세계의 한 아늑한 카페를 무대로 삼아 아름다운 음악을 작곡하며 사람들을 위로하고 있다." } ] }
         ];
 
         let characters = [];
         let currentImageBase64 = null;
         let viewingCharId = null; 
+        let currentCategoryFilter = null; 
+        let searchQuery = ''; // 🆕 현재 검색어 저장 변수
 
         function loadData() {
             const saved = localStorage.getItem('myCharacters');
@@ -210,30 +243,133 @@
             document.getElementById('readView').style.display = 'none';
             document.getElementById('editView').style.display = 'none';
         }
-        function showGallery() { hideAllViews(); document.getElementById('galleryView').style.display = 'block'; viewingCharId = null; renderGallery(); }
-        function renderGallery() { const grid = document.getElementById('galleryGrid'); grid.innerHTML = ''; characters.forEach(char => { const item = document.createElement('div'); item.className = 'gallery-item'; item.onclick = () => loadCharacter(char.id); const imgHtml = char.image ? `<img src="${char.image}" alt="${char.name}">` : `<span style="color: #ccc; font-size: 40px;">👤</span>`; item.innerHTML = `<div class="gallery-img-wrapper">${imgHtml}</div><div class="gallery-info"><div class="gallery-name">${char.name || '이름 없음'}</div><div class="gallery-role">${char.role || '-'}</div></div>`; grid.appendChild(item); }); }
-        function renderList() { const listEl = document.getElementById('charList'); listEl.innerHTML = ''; characters.forEach(char => { const li = document.createElement('li'); const img = document.createElement('img'); img.src = char.image || ''; img.className = 'char-list-img'; if (!char.image) img.style.backgroundColor = '#ddd'; const span = document.createElement('span'); span.textContent = char.name || "이름 없음"; li.appendChild(img); li.appendChild(span); li.onclick = () => loadCharacter(char.id); listEl.appendChild(li); }); }
+
+        // 🆕 실시간 검색 처리 함수
+        function performSearch() {
+            searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            renderList(); // 사이드바 목록 업데이트
+            
+            // 현재 갤러리 뷰를 보고 있다면 갤러리도 즉시 업데이트
+            if (document.getElementById('galleryView').style.display === 'block') {
+                renderGallery();
+            }
+        }
+
+        function filterByCategory(category) {
+            currentCategoryFilter = category;
+            showGallery();
+        }
+
+        function clearFilterAndShowGallery() {
+            currentCategoryFilter = null;
+            // 🆕 전체 보기 시 검색창도 초기화
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            
+            renderList(); // 검색어가 지워졌으므로 목록 전체 표시
+            showGallery();
+        }
+
+        function showGallery() { 
+            hideAllViews(); 
+            document.getElementById('galleryView').style.display = 'block'; 
+            viewingCharId = null; 
+            renderGallery(); 
+        }
+
+        function renderGallery() { 
+            const grid = document.getElementById('galleryGrid'); 
+            const banner = document.getElementById('filterBanner');
+            grid.innerHTML = ''; 
+
+            let displayCharacters = characters;
+
+            // 1. 분류 태그 필터링
+            if (currentCategoryFilter) {
+                displayCharacters = displayCharacters.filter(c => c.categories && c.categories.includes(currentCategoryFilter));
+                document.getElementById('currentFilterText').textContent = currentCategoryFilter;
+                banner.style.display = 'flex';
+            } else {
+                banner.style.display = 'none';
+            }
+
+            // 2. 검색어 필터링 (이름 또는 역할)
+            if (searchQuery) {
+                displayCharacters = displayCharacters.filter(c => {
+                    const nameMatch = (c.name || '').toLowerCase().includes(searchQuery);
+                    const roleMatch = (c.role || '').toLowerCase().includes(searchQuery);
+                    return nameMatch || roleMatch;
+                });
+            }
+
+            displayCharacters.forEach(char => { 
+                const item = document.createElement('div'); 
+                item.className = 'gallery-item'; 
+                item.onclick = () => loadCharacter(char.id); 
+                const imgHtml = char.image ? `<img src="${char.image}" alt="${char.name}">` : `<span style="color: #ccc; font-size: 40px;">👤</span>`; 
+                item.innerHTML = `<div class="gallery-img-wrapper">${imgHtml}</div><div class="gallery-info"><div class="gallery-name">${char.name || '이름 없음'}</div><div class="gallery-role">${char.role || '-'}</div></div>`; 
+                grid.appendChild(item); 
+            }); 
+            
+            if (displayCharacters.length === 0) {
+                grid.innerHTML = '<p style="color: #7f8c8d; padding: 20px;">조건에 맞는 캐릭터가 없습니다.</p>';
+            }
+        }
+
+        function renderList() { 
+            const listEl = document.getElementById('charList'); 
+            listEl.innerHTML = ''; 
+            
+            // 🆕 사이드바 목록도 검색어에 맞춰 필터링
+            let displayCharacters = characters;
+            if (searchQuery) {
+                displayCharacters = displayCharacters.filter(c => {
+                    const nameMatch = (c.name || '').toLowerCase().includes(searchQuery);
+                    const roleMatch = (c.role || '').toLowerCase().includes(searchQuery);
+                    return nameMatch || roleMatch;
+                });
+            }
+
+            displayCharacters.forEach(char => { 
+                const li = document.createElement('li'); 
+                const img = document.createElement('img'); img.src = char.image || ''; img.className = 'char-list-img'; if (!char.image) img.style.backgroundColor = '#ddd'; 
+                const span = document.createElement('span'); span.textContent = char.name || "이름 없음"; 
+                li.appendChild(img); li.appendChild(span); 
+                li.onclick = () => loadCharacter(char.id); 
+                listEl.appendChild(li); 
+            }); 
+        }
 
         function loadCharacter(id) {
             const char = characters.find(c => c.id === id);
             if (!char) return;
             viewingCharId = char.id;
 
-            // 다시 제목 아래로 역할을 복구
             document.getElementById('readName').textContent = char.name || '이름 없음';
             document.getElementById('readRole').textContent = char.role || '역할 미상';
 
+            const catBox = document.getElementById('readCategoriesBox');
+            if (char.categories && char.categories.length > 0) {
+                let html = `<span class="category-label">분류:</span>`;
+                char.categories.forEach((cat, idx) => {
+                    html += `<a class="category-tag" onclick="filterByCategory('${cat}')">${cat}</a>`;
+                    if(idx < char.categories.length - 1) html += `<span class="category-separator">|</span>`;
+                });
+                catBox.innerHTML = html;
+                catBox.style.display = 'flex';
+            } else {
+                catBox.style.display = 'none';
+            }
+
             const readImage = document.getElementById('readImage');
             if (char.image) {
-                readImage.src = char.image;
-                readImage.style.display = 'block';
+                readImage.src = char.image; readImage.style.display = 'block';
             } else {
                 readImage.style.display = 'none';
             }
 
             const table = document.getElementById('readCustomFieldsTable');
             table.innerHTML = '';
-            
             if (char.customFields && char.customFields.length > 0) {
                 char.customFields.forEach(field => {
                     const tr = document.createElement('tr');
@@ -248,8 +384,8 @@
             const tocContainer = document.getElementById('readTocContainer');
             const tocList = document.getElementById('readTocList');
             const sectionsContainer = document.getElementById('readSectionsContainer');
-            tocList.innerHTML = '';
-            sectionsContainer.innerHTML = '';
+            tocList.innerHTML = ''; sectionsContainer.innerHTML = '';
+            
             if (char.sections && char.sections.length > 0) {
                 tocContainer.style.display = 'inline-block';
                 char.sections.forEach((sec, index) => {
@@ -268,17 +404,67 @@
             document.querySelector('.main-content').scrollTop = 0; 
         }
 
-        function editCurrentCharacter() { if (!viewingCharId) return; const char = characters.find(c => c.id === viewingCharId); if (!char) return; document.getElementById('charName').value = char.name; document.getElementById('charRole').value = char.role; document.getElementById('customFieldsContainer').innerHTML = ''; if (char.customFields) { char.customFields.forEach(field => addCustomField(field.label, field.value)); } document.getElementById('sectionsEditContainer').innerHTML = ''; if (char.sections) { char.sections.forEach(sec => addSectionEditBlock(sec.title, sec.content)); } if (char.image) { document.getElementById('charImagePreview').src = char.image; document.getElementById('charImagePreview').style.display = 'block'; document.getElementById('imagePlaceholder').style.display = 'none'; currentImageBase64 = char.image; } else { resetImagePreview(); } document.getElementById('formTitle').innerText = '📝 문서 편집'; document.getElementById('deleteBtn').style.display = 'inline-block'; hideAllViews(); document.getElementById('editView').style.display = 'block'; }
-        function createNew() { viewingCharId = null; document.getElementById('charName').value = ''; document.getElementById('charRole').value = ''; document.getElementById('customFieldsContainer').innerHTML = ''; document.getElementById('sectionsEditContainer').innerHTML = ''; addSectionEditBlock('개요', ''); resetImagePreview(); document.getElementById('formTitle').innerText = '✨ 새 문서 작성'; document.getElementById('deleteBtn').style.display = 'none'; hideAllViews(); document.getElementById('editView').style.display = 'block'; }
+        function editCurrentCharacter() { 
+            if (!viewingCharId) return; const char = characters.find(c => c.id === viewingCharId); if (!char) return; 
+            document.getElementById('charName').value = char.name || ''; 
+            document.getElementById('charRole').value = char.role || ''; 
+            document.getElementById('charCategories').value = char.categories ? char.categories.join(', ') : '';
+            document.getElementById('customFieldsContainer').innerHTML = ''; 
+            if (char.customFields) { char.customFields.forEach(field => addCustomField(field.label, field.value)); } 
+            document.getElementById('sectionsEditContainer').innerHTML = ''; 
+            if (char.sections) { char.sections.forEach(sec => addSectionEditBlock(sec.title, sec.content)); } 
+            if (char.image) { document.getElementById('charImagePreview').src = char.image; document.getElementById('charImagePreview').style.display = 'block'; document.getElementById('imagePlaceholder').style.display = 'none'; currentImageBase64 = char.image; } else { resetImagePreview(); } 
+            document.getElementById('formTitle').innerText = '📝 문서 편집'; document.getElementById('deleteBtn').style.display = 'inline-block'; hideAllViews(); document.getElementById('editView').style.display = 'block'; 
+        }
+
+        function createNew() { 
+            viewingCharId = null; 
+            document.getElementById('charName').value = ''; 
+            document.getElementById('charRole').value = ''; 
+            document.getElementById('charCategories').value = ''; 
+            document.getElementById('customFieldsContainer').innerHTML = ''; 
+            document.getElementById('sectionsEditContainer').innerHTML = ''; addSectionEditBlock('개요', ''); 
+            resetImagePreview(); 
+            document.getElementById('formTitle').innerText = '새 문서 작성'; document.getElementById('deleteBtn').style.display = 'none'; hideAllViews(); document.getElementById('editView').style.display = 'block'; 
+        }
+
         function addCustomField(label = '', value = '') { const container = document.getElementById('customFieldsContainer'); const row = document.createElement('div'); row.className = 'custom-field-row'; row.innerHTML = `<input type="text" class="label-input" placeholder="항목명" value="${label}"><input type="text" class="value-input" placeholder="내용" value="${value}"><button class="btn-remove-field" onclick="this.parentElement.remove()" title="항목 삭제">❌</button>`; container.appendChild(row); }
         function addSectionEditBlock(title = '', content = '') { const container = document.getElementById('sectionsEditContainer'); const block = document.createElement('div'); block.className = 'section-edit-block'; block.innerHTML = `<button class="btn-remove-section" onclick="this.parentElement.remove()">삭제</button><input type="text" class="section-title" placeholder="문단 제목" value="${title}"><textarea class="section-content" placeholder="이 문단에 들어갈 내용을 적어주세요...">${content}</textarea>`; container.appendChild(block); }
-        function saveCharacter() { const cfRows = document.querySelectorAll('.custom-field-row'); const customFieldsArray = Array.from(cfRows).map(row => ({ label: row.querySelector('.label-input').value.trim(), value: row.querySelector('.value-input').value.trim() })).filter(field => field.label || field.value); const secBlocks = document.querySelectorAll('.section-edit-block'); const sectionsArray = Array.from(secBlocks).map(block => ({ title: block.querySelector('.section-title').value.trim() || '제목 없음', content: block.querySelector('.section-content').value.trim() })).filter(sec => sec.content); const newChar = { name: document.getElementById('charName').value, role: document.getElementById('charRole').value, image: currentImageBase64, customFields: customFieldsArray, sections: sectionsArray }; if (viewingCharId) { const index = characters.findIndex(c => c.id === viewingCharId); if (index !== -1) { characters[index] = { ...characters[index], ...newChar }; } } else { newChar.id = Date.now(); characters.push(newChar); viewingCharId = newChar.id; } saveToLocalStorage(); renderList(); loadCharacter(viewingCharId); }
+        
+        function saveCharacter() { 
+            const cfRows = document.querySelectorAll('.custom-field-row'); 
+            const customFieldsArray = Array.from(cfRows).map(row => ({ label: row.querySelector('.label-input').value.trim(), value: row.querySelector('.value-input').value.trim() })).filter(field => field.label || field.value); 
+            const secBlocks = document.querySelectorAll('.section-edit-block'); 
+            const sectionsArray = Array.from(secBlocks).map(block => ({ title: block.querySelector('.section-title').value.trim() || '제목 없음', content: block.querySelector('.section-content').value.trim() })).filter(sec => sec.content); 
+            
+            const catRaw = document.getElementById('charCategories').value;
+            const categoriesArray = catRaw.split(',').map(s => s.trim()).filter(s => s !== '');
+
+            const newChar = { 
+                name: document.getElementById('charName').value, 
+                role: document.getElementById('charRole').value, 
+                categories: categoriesArray, 
+                image: currentImageBase64, 
+                customFields: customFieldsArray, 
+                sections: sectionsArray 
+            }; 
+            
+            if (viewingCharId) { 
+                const index = characters.findIndex(c => c.id === viewingCharId); 
+                if (index !== -1) { characters[index] = { ...characters[index], ...newChar }; } 
+            } else { 
+                newChar.id = Date.now(); characters.push(newChar); viewingCharId = newChar.id; 
+            } 
+            saveToLocalStorage(); renderList(); loadCharacter(viewingCharId); 
+        }
+
         function cancelEdit() { if (viewingCharId) { loadCharacter(viewingCharId); } else { showGallery(); } }
         function deleteCharacter() { if (!viewingCharId) return; if(confirm("정말로 이 문서를 삭제할까요?")) { characters = characters.filter(c => c.id !== viewingCharId); saveToLocalStorage(); renderList(); showGallery(); } }
         function previewImage() { const fileInput = document.getElementById('charImageInput'); const reader = new FileReader(); reader.onload = function(e) { document.getElementById('charImagePreview').src = e.target.result; document.getElementById('charImagePreview').style.display = 'block'; document.getElementById('imagePlaceholder').style.display = 'none'; currentImageBase64 = e.target.result; }; if (fileInput.files[0]) reader.readAsDataURL(fileInput.files[0]); }
         function resetImagePreview() { document.getElementById('charImagePreview').src = ''; document.getElementById('charImagePreview').style.display = 'none'; document.getElementById('imagePlaceholder').style.display = 'block'; document.getElementById('charImageInput').value = ''; currentImageBase64 = null; }
         function exportData() { if (characters.length === 0) { alert("백업할 데이터가 없습니다."); return; } const dataStr = JSON.stringify(characters, null, 2); const blob = new Blob([dataStr], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "my_character_wiki_backup.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }
         function importData(event) { const reader = new FileReader(); reader.onload = function(e) { try { const importedData = JSON.parse(e.target.result); if (Array.isArray(importedData)) { if(confirm("현재 작성된 데이터에 덮어쓰거나 추가됩니다. 계속하시겠습니까?")) { characters = importedData; saveToLocalStorage(); renderList(); showGallery(); alert("성공적으로 데이터를 복구했습니다!"); } } else { alert("잘못된 형식의 파일입니다."); } } catch (error) { alert("파일을 읽는 중 오류가 발생했습니다."); } event.target.value = ''; }; if (event.target.files[0]) reader.readAsText(event.target.files[0]); }
+        
         window.onload = loadData;
     </script>
 </body>
