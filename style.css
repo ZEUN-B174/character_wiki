@@ -1,0 +1,104 @@
+body { font-family: 'Pretendard', sans-serif; display: flex; margin: 0; height: 100vh; background-color: #f4f4f9; color: #333; }
+
+.sidebar { width: 250px; background-color: #2c3e50; color: white; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; flex-shrink: 0;}
+.sidebar h2 { margin-top: 0; border-bottom: 2px solid #34495e; padding-bottom: 10px; font-size: 20px;}
+
+.search-box { width: 100%; padding: 10px 12px; margin-bottom: 25px; border: none; border-radius: 5px; box-sizing: border-box; background-color: #1a252f; color: white; font-family: inherit; font-size: 14px; transition: 0.2s;}
+.search-box::placeholder { color: #7f8c8d; }
+.search-box:focus { outline: 2px solid #3498db; background-color: #0f161c;}
+
+.btn-menu { color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 15px; font-weight: bold; margin-bottom: 8px;}
+.btn-gallery { background-color: #8e44ad; }
+.btn-gallery:hover { background-color: #9b59b6; }
+.btn-add { background-color: #27ae60; }
+.btn-add:hover { background-color: #2ecc71; }
+.btn-backup { background-color: #f39c12; margin-top: 10px;}
+.btn-backup:hover { background-color: #e67e22; }
+.btn-restore { background-color: #d35400; }
+.btn-restore:hover { background-color: #e67e22; }
+
+.main-content { flex-grow: 1; padding: 40px; overflow-y: auto; scroll-behavior: smooth; }
+.wiki-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 850px; margin: 0 auto; display: flex; flex-direction: column; }
+
+.gallery-header { margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;}
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+.gallery-item { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #eee;}
+.gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); border-color: #ccc;}
+.gallery-img-wrapper { width: 100%; height: 200px; background-color: #eee; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.gallery-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-info { padding: 15px; text-align: center; }
+.gallery-name { font-weight: bold; font-size: 18px; margin-bottom: 5px; color: #2c3e50;}
+.gallery-role { font-size: 13px; color: #7f8c8d; }
+
+.filter-banner { background-color: #e8f4f8; border: 1px solid #bce8f1; color: #31708f; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold;}
+.btn-clear-filter { background-color: #31708f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 13px;}
+.btn-clear-filter:hover { background-color: #245269; }
+
+.read-title-group { margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+.read-name { font-size: 36px; font-weight: bold; margin: 0 0 5px 0; color: #2c3e50; }
+.read-role { font-size: 18px; color: #7f8c8d; margin: 0 0 15px 0; }
+
+.category-box { border: 1px solid #ccc; padding: 10px 15px; border-radius: 4px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 14px; background-color: #fdfdfd;}
+.category-label { font-weight: bold; color: #2c3e50; }
+.category-tag { color: #0645ad; cursor: pointer; text-decoration: none; display: flex; align-items: center;}
+.category-tag:hover { text-decoration: underline; color: #0b0080;}
+.category-separator { color: #ccc; margin: 0 2px; }
+
+.top-layout-group { display: flex; gap: 30px; margin-bottom: 40px; align-items: flex-start; }
+.left-content-group { flex: 1; display: flex; flex-direction: column; gap: 20px;}
+
+.toc-container { border: 1px solid #a2a9b1; background-color: #f8f9fa; padding: 15px 20px; border-radius: 5px; display: inline-block; min-width: 280px; width: fit-content;}
+.toc-title { font-weight: bold; font-size: 18px; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;}
+.toc-list { list-style: none; padding-left: 0; margin: 0; line-height: 1.8;}
+.toc-list li a { text-decoration: none; color: #0645ad; font-size: 15px;}
+.toc-list li a:hover { text-decoration: underline; }
+
+.right-info-group { flex: 0 0 380px; display: flex; flex-direction: column; gap: 10px;}
+.read-profile-img { width: 100%; aspect-ratio: 1/1; border-radius: 8px; object-fit: cover; background-color: #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-shrink: 0; border: 1px solid #ddd;}
+
+.info-table { width: 100%; border-collapse: collapse; background-color: #f8f9fa; border-radius: 8px; overflow: hidden; border: 1px solid #e9ecef; table-layout: fixed;}
+.info-table th, .info-table td { padding: 10px 12px; border-bottom: 1px solid #e9ecef; font-size: 14px; word-break: break-all;}
+.info-table th { width: 25%; text-align: left; background-color: #e9ecef; color: #495057; font-weight: bold;}
+.info-table tr:last-child th, .info-table tr:last-child td { border-bottom: none; }
+
+.read-sections-container { border-top: 1px solid #eee; padding-top: 20px;}
+.wiki-section { margin-bottom: 40px; }
+.wiki-section-title { font-size: 26px; color: #2c3e50; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; margin-top: 0;}
+.wiki-section-content { line-height: 1.7; font-size: 16px; color: #34495e; white-space: pre-wrap; word-break: keep-all;}
+.wiki-section-content strong { color: #000; font-weight: 800; }
+.wiki-section-content mark { background-color: #ffeaa7; padding: 2px 5px; border-radius: 3px; color: #d35400; font-weight: bold;}
+.wiki-section-content blockquote { border-left: 5px solid #3498db; margin: 15px 0; padding: 10px 15px; background-color: #f4f8fa; color: #555; border-radius: 0 5px 5px 0;}
+.wiki-section-content a { color: #2980b9; text-decoration: none; font-weight: bold;}
+.wiki-section-content a:hover { text-decoration: underline; color: #1c5980;}
+
+.profile-header { display: flex; align-items: center; margin-bottom: 20px; }
+.image-uploader { width: 150px; height: 150px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); object-fit: cover; background-color: #eee; margin-right: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;}
+.image-uploader img { width: 100%; height: 100%; object-fit: cover; display: none;}
+.image-uploader .placeholder { color: #888; text-align: center; font-size: 14px;}
+
+input[type="text"], textarea { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: inherit; }
+
+.custom-field-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+.custom-field-row input { margin-bottom: 0; }
+.custom-field-row .label-input { width: 30%; font-weight: bold; background-color: #f8f9fa; border-color: #bbb;}
+.custom-field-row .value-input { width: 70%; }
+.btn-remove-field { background-color: #e74c3c; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: 0.2s;}
+
+.section-edit-block { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative;}
+.section-edit-block textarea { min-height: 120px; resize: vertical; margin-bottom: 0;}
+.section-edit-block input { font-weight: bold; font-size: 16px; margin-bottom: 10px;}
+.btn-remove-section { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 5px 10px; cursor: pointer; font-size: 12px;}
+
+.md-help { font-size: 13px; color: #7f8c8d; margin-bottom: 5px; background: #fff; display: inline-block; padding: 4px 8px; border-radius: 4px; border: 1px solid #e1e1e1;}
+.md-help code { background: #eee; padding: 2px 4px; border-radius: 3px; color: #c0392b;}
+
+.btn-add-dashed { background-color: #ecf0f1; color: #2c3e50; border: 2px dashed #bdc3c7; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 20px; transition: 0.2s;}
+.btn-add-dashed:hover { background-color: #e2e6e8; border-color: #95a5a6; }
+
+.button-group { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee;}
+.btn { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.2s; font-weight: bold;}
+.btn:hover { background-color: #2980b9; }
+.btn-danger { background-color: #e74c3c; }
+.btn-danger:hover { background-color: #c0392b; }
+.btn-cancel { background-color: #95a5a6; }
+.btn-cancel:hover { background-color: #7f8c8d; }
